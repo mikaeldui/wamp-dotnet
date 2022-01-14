@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.Net.WebSockets.Wamp", "DotNet.Net.WebSockets.Wamp\DotNet.Net.WebSockets.Wamp.csproj", "{1B5C01C1-E083-41D6-96F5-7D813A54C1FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNet.Net.WebSockets.Wamp.Tests", "DotNet.Net.WebSockets.Wamp.Tests\DotNet.Net.WebSockets.Wamp.Tests.csproj", "{FCA6F9AA-34D6-4ACC-B0E0-DBE2FE6F5D70}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1B5C01C1-E083-41D6-96F5-7D813A54C1FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B5C01C1-E083-41D6-96F5-7D813A54C1FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B5C01C1-E083-41D6-96F5-7D813A54C1FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B5C01C1-E083-41D6-96F5-7D813A54C1FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCA6F9AA-34D6-4ACC-B0E0-DBE2FE6F5D70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCA6F9AA-34D6-4ACC-B0E0-DBE2FE6F5D70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCA6F9AA-34D6-4ACC-B0E0-DBE2FE6F5D70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCA6F9AA-34D6-4ACC-B0E0-DBE2FE6F5D70}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

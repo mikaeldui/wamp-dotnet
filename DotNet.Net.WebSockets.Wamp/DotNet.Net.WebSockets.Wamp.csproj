@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0;net6.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>System.Net.WebSockets.Wamp</RootNamespace>
+    <PackageId>MikaelDui.DotNet.Net.WebSockets.Wamp</PackageId>
+    <Authors>Mikael Dúi Bolinder</Authors>
+    <Product>MikaelDui.DotNet.Net.WebSockets.Wamp</Product>
+    <Description>This project is really awesome!</Description>
+    <PackageProjectUrl>https://github.com/mikaeldui/dotnet-net-websockets-wamp</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>DotNet.Net.WebSockets.Wamp.png</PackageIcon>
+    <RepositoryUrl>https://github.com/mikaeldui/dotnet-net-websockets-wamp</RepositoryUrl>
+    <PackageTags></PackageTags>
+    <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\DotNet.Net.WebSockets.Wamp.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MikaelDui.Extensions" Version="*" />
+  </ItemGroup>
+
+</Project>
