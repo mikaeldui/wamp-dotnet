@@ -11,7 +11,14 @@ namespace System.Net.WebSockets.Wamp
         Task CloseAsync(CancellationToken cancellationToken = default);
     }
 
-    public interface IWampRole<TMessageCodeEnum> : IWampRole, IDisposable
+    public interface IWampRole<TMessageCodes> : IWampRole
+        where TMessageCodes : WampMessageCodes
+    {
+        TMessageCodes MessageCodes { get; }
+    }
+
+    public interface IWampRole<TMessageCodes, TMessageCodeEnum> : IWampRole<TMessageCodes>, IWampRole, IDisposable
+        where TMessageCodes : WampMessageCodes
         where TMessageCodeEnum : struct, Enum
     {
         Task SendAsync(WampRequestMessage<TMessageCodeEnum> message, CancellationToken cancellationToken = default);
@@ -24,17 +31,25 @@ namespace System.Net.WebSockets.Wamp
         Task ConnectAsync(string uri, CancellationToken cancellationToken = default);
     }
 
-    public interface IWampRoleClient<TMessageCodeEnum> : IWampRole<TMessageCodeEnum>, IWampRoleClient
+    public interface IWampRoleClient<TMessageCodes> : IWampRoleClient, IWampRole<TMessageCodes>, IWampRole
+        where TMessageCodes : WampMessageCodes
+    {
+    }
+
+    public interface IWampRoleClient<TMessageCodes, TMessageCodeEnum> : 
+        IWampRoleClient<TMessageCodes>, IWampRoleClient, 
+        IWampRole<TMessageCodes, TMessageCodeEnum>, IWampRole<TMessageCodes>, IWampRole
+        where TMessageCodes : WampMessageCodes
         where TMessageCodeEnum : struct, Enum
     {
     }
 
     //[EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class WampRoleBase<TMessageCodes> : IWampRole
-        where TMessageCodes : WampRoleMessageCodes<TMessageCodes>
+    public abstract class WampRoleBase<TMessageCodes> : IWampRole<TMessageCodes>, IWampRole
+        where TMessageCodes : WampMessageCodes
     {
         protected readonly WebSocket WebSocket;
-        public readonly TMessageCodes MessageCodes;
+        public TMessageCodes MessageCodes { get; }
 
         internal protected WampRoleBase(WebSocket webSocket, TMessageCodes messageCodes)
         {
@@ -96,8 +111,9 @@ namespace System.Net.WebSockets.Wamp
     }
 
     //[EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class WampRoleBase<TMessageCodes, TMessageCodeEnum> : WampRoleBase<TMessageCodes>, IWampRole<TMessageCodeEnum>, IWampRole
-        where TMessageCodes : WampRoleMessageCodes<TMessageCodes>
+    public abstract class WampRoleBase<TMessageCodes, TMessageCodeEnum> : 
+        WampRoleBase<TMessageCodes>, IWampRole<TMessageCodes, TMessageCodeEnum>, IWampRole<TMessageCodes>, IWampRole
+        where TMessageCodes : WampMessageCodes
         where TMessageCodeEnum : struct, Enum
     {
         internal protected WampRoleBase(WebSocket webSocket, TMessageCodes messageCodes) : base(webSocket, messageCodes)
@@ -117,8 +133,10 @@ namespace System.Net.WebSockets.Wamp
     }
 
     //[EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class WampRoleClientBase<TMessageCodes> : WampRoleBase<TMessageCodes>, IWampRoleClient, IWampRole
-        where TMessageCodes : WampRoleMessageCodes<TMessageCodes>
+    public abstract class WampRoleClientBase<TMessageCodes> : 
+        WampRoleBase<TMessageCodes>, IWampRoleClient<TMessageCodes>, IWampRoleClient, 
+        IWampRole<TMessageCodes>, IWampRole
+        where TMessageCodes : WampMessageCodes
     {
         protected new ClientWebSocket WebSocket;
 
@@ -135,8 +153,10 @@ namespace System.Net.WebSockets.Wamp
     }
 
     //[EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class WampRoleClientBase<TMessageCodes, TMessageCodeEnum> : WampRoleClientBase<TMessageCodes>, IWampRoleClient<TMessageCodeEnum>, IWampRoleClient, IWampRole<TMessageCodeEnum>, IWampRole
-        where TMessageCodes : WampRoleMessageCodes<TMessageCodes>
+    public abstract class WampRoleClientBase<TMessageCodes, TMessageCodeEnum> :
+        WampRoleClientBase<TMessageCodes>, IWampRoleClient<TMessageCodes, TMessageCodeEnum>, IWampRoleClient<TMessageCodes>, IWampRoleClient, 
+        IWampRole<TMessageCodes, TMessageCodeEnum>, IWampRole<TMessageCodes>, IWampRole
+        where TMessageCodes : WampMessageCodes
         where TMessageCodeEnum : struct, Enum
     {
         protected new ClientWebSocket WebSocket;

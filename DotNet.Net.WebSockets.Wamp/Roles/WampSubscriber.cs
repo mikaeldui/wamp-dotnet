@@ -1,24 +1,24 @@
 ﻿namespace System.Net.WebSockets.Wamp
 {
-    public interface IWampSubscriber : IWampRole
+    public interface IWampSubscriber : IWampRole<WampSubscriberMessageCodes>, IWampRole
     {
         Task SubscribeAsync(string topic, CancellationToken cancellationToken = default);
         Task UnsubscribeAsync(string topic, CancellationToken cancellationToken = default);
     }
 
-    public interface IWampSubscriber<TMessageCodeEnum> : IWampSubscriber, IWampRole<TMessageCodeEnum>
-    where TMessageCodeEnum : struct, Enum
+    public interface IWampSubscriber<TMessageCodeEnum> : IWampSubscriber, IWampRole<WampSubscriberMessageCodes, TMessageCodeEnum>, IWampRole
+        where TMessageCodeEnum : struct, Enum
     {
     }
 
-    //internal class WampSubscriberMethods
-    //{
-    //    public async Task SendSubscribeAsync(this IWampSubscriber wampSubscriber, string topic, CancellationToken cancellationToken = default) =>
-    //        await wampSubscriber.SendAsync(new(wampSubscriber.MessageCodes.Subscribe, topic), cancellationToken);
+    internal static class WampSubscriberMethods
+    {
+        public static async Task SendSubscribeAsync(this IWampSubscriber wampSubscriber, string topic, CancellationToken cancellationToken = default) =>
+            await wampSubscriber.SendAsync(new(wampSubscriber.MessageCodes.Subscribe, topic), cancellationToken);
 
-    //    public async Task SendUnsubscribeAsync(string topic, CancellationToken cancellationToken = default) =>
-    //        await SendAsync(new(MessageCodes.Unsubscribe, topic), cancellationToken);
-    //}
+        public static async Task SendUnsubscribeAsync(this IWampSubscriber wampSubscriber, string topic, CancellationToken cancellationToken = default) =>
+            await wampSubscriber.SendAsync(new(wampSubscriber.MessageCodes.Unsubscribe, topic), cancellationToken);
+    }
 
     public class WampSubscriber : WampRoleBase<WampSubscriberMessageCodes>, IWampSubscriber
     {
@@ -27,11 +27,26 @@
         {
         }
 
-        public async Task SubscribeAsync(string topic, CancellationToken cancellationToken = default) => 
-            await SendAsync(new(MessageCodes.Subscribe, topic), cancellationToken);
+        public async Task SubscribeAsync(string topic, CancellationToken cancellationToken = default) => await this.SendSubscribeAsync(topic, cancellationToken);
 
-        public async Task UnsubscribeAsync(string topic, CancellationToken cancellationToken = default) => 
-            await SendAsync(new(MessageCodes.Unsubscribe, topic), cancellationToken);
+        public async Task UnsubscribeAsync(string topic, CancellationToken cancellationToken = default) => await this.SendUnsubscribeAsync(topic, cancellationToken);
+    }
+
+    /// <summary>
+    /// For use with a custom WebSocket.
+    /// </summary>
+    /// <typeparam name="TMessageCodeEnum">Required to have "Subscribe", "Unsubscribe" and "Event". Type is Uint16.</typeparam>
+    public class WampSubscriber<TMessageCodeEnum> : WampRoleBase<WampSubscriberMessageCodes, TMessageCodeEnum>, IWampSubscriber<TMessageCodeEnum>, IWampSubscriber
+        where TMessageCodeEnum : struct, Enum
+    {
+        public WampSubscriber(WebSocket webSocket, WampSubscriberMessageCodes? messageCodes = null) :
+            base(webSocket, messageCodes ?? WampSubscriberMessageCodes.BasicProfile)
+        {
+        }
+
+        public async Task SubscribeAsync(string topic, CancellationToken cancellationToken = default) => await this.SendSubscribeAsync(topic, cancellationToken);
+
+        public async Task UnsubscribeAsync(string topic, CancellationToken cancellationToken = default) => await this.SendUnsubscribeAsync(topic, cancellationToken);
     }
 
     public class WampSubscriberClient : WampRoleClientBase<WampSubscriberMessageCodes>, IWampSubscriber
@@ -47,13 +62,12 @@
         {
         }
 
-        public async Task SubscribeAsync(string topic, CancellationToken cancellationToken = default) => 
-            await SendAsync(new(MessageCodes.Subscribe, topic), cancellationToken);
+        public async Task SubscribeAsync(string topic, CancellationToken cancellationToken = default) => await this.SendSubscribeAsync(topic, cancellationToken);
 
-        public async Task UnsubscribeAsync(string topic, CancellationToken cancellationToken = default) => 
-            await SendAsync(new(MessageCodes.Unsubscribe, topic), cancellationToken);
+        public async Task UnsubscribeAsync(string topic, CancellationToken cancellationToken = default) => await this.SendUnsubscribeAsync(topic, cancellationToken);
     }
 
+    /// <typeparam name="TMessageCodeEnum">Required to have "Subscribe", "Unsubscribe" and "Event". Type is Uint16.</typeparam>
     public class WampSubscriberClient<TMessageCodeEnum> : WampRoleClientBase<WampSubscriberMessageCodes, TMessageCodeEnum>, IWampSubscriber<TMessageCodeEnum>, IWampSubscriber
         where TMessageCodeEnum : struct, Enum
     {
@@ -64,10 +78,8 @@
         {
         }
 
-        public async Task SubscribeAsync(string topic, CancellationToken cancellationToken = default) => 
-            await SendAsync(new WampRequestMessage(MessageCodes.Subscribe, topic), cancellationToken);
+        public async Task SubscribeAsync(string topic, CancellationToken cancellationToken = default) => await this.SendSubscribeAsync(topic, cancellationToken);
 
-        public async Task UnsubscribeAsync(string topic, CancellationToken cancellationToken = default) => 
-            await SendAsync(new WampRequestMessage(MessageCodes.Unsubscribe, topic), cancellationToken);
+        public async Task UnsubscribeAsync(string topic, CancellationToken cancellationToken = default) => await this.SendUnsubscribeAsync(topic, cancellationToken);
     }
 }
