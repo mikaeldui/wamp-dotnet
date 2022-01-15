@@ -1,7 +1,7 @@
 
 # Mikael Dúi's [WAMP][wamp] Library for .NET
-[![.NET](https://github.com/mikaeldui/dotnet-net-websockets-wamp/actions/workflows/dotnet.yml/badge.svg)](https://github.com/mikaeldui/dotnet-net-websockets-wamp/actions/workflows/dotnet.yml)
-[![CodeQL Analysis](https://github.com/mikaeldui/dotnet-net-websockets-wamp/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mikaeldui/dotnet-net-websockets-wamp/actions/workflows/codeql-analysis.yml)
+[![.NET](https://github.com/mikaeldui/wamp-dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/mikaeldui/wamp-dotnet/actions/workflows/dotnet.yml)
+[![CodeQL Analysis](https://github.com/mikaeldui/wamp-dotnet/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mikaeldui/wamp-dotnet/actions/workflows/codeql-analysis.yml)
 
 ![image](https://user-images.githubusercontent.com/3706841/149625415-709dd31c-425d-4421-9d60-5eb4757f83bd.png)
 
