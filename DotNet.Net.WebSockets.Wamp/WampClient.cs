@@ -30,16 +30,19 @@ namespace System.Net.WebSockets.Wamp
     }
 
     //[EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class WampRoleBase : IWampRole
+    public abstract class WampRoleBase<TMessageCodes> : IWampRole
+        where TMessageCodes : WampRoleMessageCodes<TMessageCodes>
     {
         protected readonly WebSocket WebSocket;
+        public readonly TMessageCodes MessageCodes;
 
-        internal protected WampRoleBase(WebSocket webSocket)
+        internal protected WampRoleBase(WebSocket webSocket, TMessageCodes messageCodes)
         {
-            WebSocket = webSocket;
+            WebSocket = webSocket ?? throw new ArgumentNullException("WebSockets can't be null!", nameof(webSocket));
+            MessageCodes = messageCodes ?? throw new ArgumentNullException("Message Codes can't be null!", nameof(messageCodes));
         }
 
-        public virtual async Task CloseAsync(CancellationToken cancellationToken = default) => 
+        public virtual async Task CloseAsync(CancellationToken cancellationToken = default) =>
             await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, cancellationToken);
 
         protected async Task<JsonElement[]> ReceiveJsonArrayAsync(CancellationToken cancellationToken = default)
@@ -48,7 +51,7 @@ namespace System.Net.WebSockets.Wamp
 
             // The League client sometimes sends empty strings. Unsure why.
             for (int i = 0; i < 100 && string.IsNullOrEmpty(json); i++)
-                json = await WebSocket.ReceiveStringAsync();
+                json = await WebSocket.ReceiveStringAsync(cancellationToken);
 
             using var doc = JsonDocument.Parse(json);
 
@@ -58,6 +61,7 @@ namespace System.Net.WebSockets.Wamp
             if (doc.RootElement.GetArrayLength() == 0)
                 throw new WampResponseException("The returned JSON array didn't contain any values!", json);
 
+            // TODO: Check if one enumerator is enough
             var enumerator = doc.RootElement.EnumerateArray();
             enumerator.MoveNext();
             if (enumerator.Current.ValueKind != JsonValueKind.Number)
@@ -92,16 +96,6 @@ namespace System.Net.WebSockets.Wamp
     }
 
     //[EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class WampRoleBase<TMessageCodes> : WampRoleBase, IWampRole
-        where TMessageCodes : WampRoleMessageCodes<TMessageCodes>
-    {
-        protected readonly TMessageCodes MessageCodes;
-
-        internal protected WampRoleBase(WebSocket webSocket, TMessageCodes messageCodes) : base(webSocket) => 
-            MessageCodes = messageCodes;
-    }
-
-    //[EditorBrowsable(EditorBrowsableState.Never)]
     public abstract class WampRoleBase<TMessageCodes, TMessageCodeEnum> : WampRoleBase<TMessageCodes>, IWampRole<TMessageCodeEnum>, IWampRole
         where TMessageCodes : WampRoleMessageCodes<TMessageCodes>
         where TMessageCodeEnum : struct, Enum
@@ -120,35 +114,6 @@ namespace System.Net.WebSockets.Wamp
         }
 
         async Task<WampResponseMessage> IWampRole.ReceiveAsync(CancellationToken cancellationToken) => await base.ReceiveAsync(cancellationToken);
-    }
-
-    //[EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class WampRoleClientBase : WampRoleBase, IWampRoleClient, IWampRole
-    {
-        protected new ClientWebSocket WebSocket;
-
-        internal protected WampRoleClientBase() : base(new ClientWebSocket())
-        {
-            WebSocket = (ClientWebSocket)base.WebSocket;
-        }
-
-        public async Task ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
-        {
-            await WebSocket.ConnectAsync(uri, cancellationToken);
-        }
-
-        public async Task ConnectAsync(string uri, CancellationToken cancellationToken = default)
-        {
-            if (string.IsNullOrEmpty(uri))
-                throw new ArgumentNullException(nameof(uri));
-
-            var uriUri = new Uri(uri);
-
-            if (!uriUri.IsAbsoluteUri)
-                throw new ArgumentException("The URI must be absolute.", nameof(uriUri));
-
-            await WebSocket.ConnectAsync(uriUri, cancellationToken);
-        }
     }
 
     //[EditorBrowsable(EditorBrowsableState.Never)]
@@ -184,7 +149,7 @@ namespace System.Net.WebSockets.Wamp
 
         public new virtual async Task<WampResponseMessage<TMessageCodeEnum>> ReceiveAsync(CancellationToken cancellationToken = default)
         {
-            var array = await base.ReceiveJsonArrayAsync();
+            var array = await ReceiveJsonArrayAsync();
             return new WampResponseMessage<TMessageCodeEnum>(array[0].GetUInt16(), array.Skip(1).ToArray());
         }
 
