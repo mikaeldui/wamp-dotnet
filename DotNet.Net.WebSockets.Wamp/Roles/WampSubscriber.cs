@@ -1,13 +1,16 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel;
+using System.Text.Json;
 
 namespace System.Net.WebSockets.Wamp
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IWampSubscriber : IWampRole<WampSubscriberMessageTypeCodes>, IWampRole
     {
         Task SubscribeAsync(string topic, CancellationToken cancellationToken = default);
         Task UnsubscribeAsync(string topic, CancellationToken cancellationToken = default);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IWampSubscriber<TMessageTypeCodeEnum> : IWampSubscriber, IWampRole<WampSubscriberMessageTypeCodes, TMessageTypeCodeEnum>, IWampRole
         where TMessageTypeCodeEnum : struct, Enum
     {
@@ -76,7 +79,7 @@ namespace System.Net.WebSockets.Wamp
         }
 
         /// <summary>
-        /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageCode"/>.
+        /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageTypeCode"/>.
         /// </summary>
         public WampSubscriberClient(Type subscriberMessageCodesEnum) : base(WampSubscriberMessageTypeCodes.FromEnum(subscriberMessageCodesEnum))
         {
@@ -94,7 +97,7 @@ namespace System.Net.WebSockets.Wamp
         where TMessageCodeEnum : struct, Enum
     {
         /// <summary>
-        /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageCode"/>.
+        /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageTypeCode"/>.
         /// </summary>
         public WampSubscriberClient() : base(WampSubscriberMessageTypeCodes.FromEnum<TMessageCodeEnum>())
         {

@@ -2,7 +2,7 @@
 {
     public static class WampBasicProfile
     {
-        public enum WampMessageCode : ushort
+        public enum WampMessageTypeCode : ushort
         {
             Hello = 1,
             Welcome = 2,
@@ -33,7 +33,7 @@
             Extension = 0
         }
 
-        public enum WampRoleMessageCode
+        public enum WampRoleMessageTypeCode : ushort
         {
             Hello = 1,
             Welcome = 2,
@@ -43,7 +43,7 @@
             Error = 8
         }
 
-        public enum WampCalleeMessageCode : ushort
+        public enum WampCalleeMessageTypeCode : ushort
         {
             Hello = 1,
             Welcome = 2,
@@ -62,7 +62,7 @@
             Extension = 0
         }
 
-        public enum WampCallerMessageCode : ushort
+        public enum WampCallerMessageTypeCode : ushort
         {
             Hello = 1,
             Welcome = 2,
@@ -80,7 +80,7 @@
             Extension = 0
         }
 
-        public enum WampPublisherMessageCode : ushort
+        public enum WampPublisherMessageTypeCode : ushort
         {
             Hello = 1,
             Welcome = 2,
@@ -95,7 +95,7 @@
             Extension = 0
         }
 
-        public enum WampSubscriberMessageCode : ushort
+        public enum WampSubscriberMessageTypeCode : ushort
         {
             Hello = 1,
             Welcome = 2,
@@ -113,7 +113,7 @@
             Extension = 0
         }
 
-        public enum WampDealerMessageCode : ushort
+        public enum WampDealerMessageTypeCode : ushort
         {
             Hello = 1,
             Welcome = 2,
@@ -135,7 +135,7 @@
             Extension = 0
         }
 
-        public enum WampBrokerMessageCode : ushort
+        public enum WampBrokerMessageTypeCode : ushort
         {
             Hello = 1,
             Welcome = 2,

@@ -1,35 +1,45 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 
 namespace System.Net.WebSockets.Wamp
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public interface IWampMessage
+    {
+        ushort MessageCode { get; set; }
+        object[] Elements { get; }
+    }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public interface IWampMessage<TMessageTypeCodeEnum> : IWampMessage
+        where TMessageTypeCodeEnum : struct, Enum
+    {
+        new TMessageTypeCodeEnum MessageCode { get; set; }
+    }
+
     [DebuggerDisplay("MessageCode = {MessageCode} Element = {Elements}")]
-    public class WampRequestMessage : IWampMessage
+    public class WampMessage : IWampMessage
     {
         // TODO: Maybe object[] isn't the best.
-        internal WampRequestMessage(object[] elements)
+        internal WampMessage(object[] elements)
         {
-            Elements = elements.ToList();
+            Elements = elements;
         }
 
-        public WampRequestMessage(ushort messageType, params object[] elements) : this(elements)
+        public WampMessage(ushort messageType, params object[] elements) : this(elements)
         {
             MessageCode = messageType;
         }
 
         public ushort MessageCode { get; set; }
-        public List<object> Elements { get; }
-        IEnumerable<object> IWampMessage.Elements => Elements;
+        public object[] Elements { get; }
     }
 
     [DebuggerDisplay("MessageCode = {MessageCode} Element = {Elements}")]
-    public class WampRequestMessage<TWampMessageTypeEnum> : WampRequestMessage, IWampMessage
+    public class WampMessage<TWampMessageTypeEnum> : WampMessage, IWampMessage<TWampMessageTypeEnum>, IWampMessage
     where TWampMessageTypeEnum : struct, Enum, IConvertible
     {
-        internal WampRequestMessage(ushort messageCode, params object[] elements) : this((TWampMessageTypeEnum)Enum.ToObject(typeof(TWampMessageTypeEnum), messageCode), elements)
-        {
-        }
-
-        public WampRequestMessage(TWampMessageTypeEnum messageCode, params object[] elements) : base(elements)
+        public WampMessage(TWampMessageTypeEnum messageCode, params object[] elements) : base(elements)
         {
             MessageCode = messageCode;
         }

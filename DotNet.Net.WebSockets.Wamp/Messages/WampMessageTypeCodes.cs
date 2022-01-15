@@ -8,13 +8,13 @@ namespace System.Net.WebSockets.Wamp
     internal static class WampMessageTypeCodesLoader
     {
         /// <summary>
-        /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageCode"/>.
+        /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageTypeCode"/>.
         /// </summary>
         internal static T LoadFromEnum<T>(Type @enum)
             where T : WampMessageTypeCodes
         {
             var type = typeof(T);
-            var messageCodes = (T) Activator.CreateInstance(type, true);
+            T messageCodes = (T) Activator.CreateInstance(type, true);
             foreach (var code in Enum.GetNames(@enum))
             {
                 var propertyInfo = type.GetProperty(code);
@@ -49,6 +49,7 @@ namespace System.Net.WebSockets.Wamp
         internal bool IsReadOnly = false;
     }
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class WampSubscriberMessageTypeCodes : WampMessageTypeCodes
     {
         internal WampSubscriberMessageTypeCodes()
@@ -74,15 +75,15 @@ namespace System.Net.WebSockets.Wamp
         public ushort? Unsubscribed { get => _unsubscribed; set { if (IsReadOnly) throw new InvalidOperationException("This WampMessageCodes is read-only."); _unsubscribed = value; } }
         public ushort Event { get => _event; set { if (IsReadOnly) throw new InvalidOperationException("This WampMessageCodes is read-only."); _event = value; } }
 
-        public static readonly WampSubscriberMessageTypeCodes BasicProfile = FromEnum<WampBasicProfile.WampSubscriberMessageCode>();
+        public static readonly WampSubscriberMessageTypeCodes BasicProfile = FromEnum<WampBasicProfile.WampSubscriberMessageTypeCode>();
 
         /// <summary>
-        /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageCode"/>.
+        /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageTypeCode"/>.
         /// </summary>
         public static WampSubscriberMessageTypeCodes FromEnum<TEnum>() where TEnum : struct, Enum => FromEnum(typeof(TEnum));
 
         /// <summary>
-        /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageCode"/>.
+        /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageTypeCode"/>.
         /// </summary>
         public static WampSubscriberMessageTypeCodes FromEnum(Type @enum) => WampMessageTypeCodesLoader.LoadFromEnum<WampSubscriberMessageTypeCodes>(@enum);
     }

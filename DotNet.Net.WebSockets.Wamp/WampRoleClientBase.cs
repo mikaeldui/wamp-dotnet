@@ -3,17 +3,20 @@ using System.Text.Json;
 
 namespace System.Net.WebSockets.Wamp
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IWampRoleClient : IWampRole
     {
         Task ConnectAsync(Uri uri, CancellationToken cancellationToken = default);
         Task ConnectAsync(string uri, CancellationToken cancellationToken = default);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IWampRoleClient<TMessageTypeCodes> : IWampRoleClient, IWampRole<TMessageTypeCodes>, IWampRole
         where TMessageTypeCodes : WampMessageTypeCodes
     {
     }
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IWampRoleClient<TMessageTypeCodes, TMessageTypeCodeEnum> :
         IWampRoleClient<TMessageTypeCodes>, IWampRoleClient,
         IWampRole<TMessageTypeCodes, TMessageTypeCodeEnum>, IWampRole<TMessageTypeCodes>, IWampRole
@@ -53,26 +56,26 @@ namespace System.Net.WebSockets.Wamp
         {
         }
 
-        public virtual async Task SendAsync(WampRequestMessage<TMessageTypeCodeEnum> message, CancellationToken cancellationToken = default) =>
+        public virtual async Task SendAsync(WampMessage<TMessageTypeCodeEnum> message, CancellationToken cancellationToken = default) =>
             await base.SendAsync(message, cancellationToken);
 
 
 #pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
         [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Use the other OnMessageReceived. This method is NOT called in this class.", true)]
-        protected override WampResponseMessage OnMessageReceived(ushort messageCode, JsonElement[] elements) => throw new NotImplementedException();
+        protected override WampMessage OnMessageReceived(ushort messageCode, JsonElement[] elements) => throw new NotImplementedException();
 #pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
 
         /// <summary>
         /// Override this method to do custom logic on messages received.
         /// </summary>
-        protected virtual WampResponseMessage<TMessageTypeCodeEnum> OnMessageReceived(TMessageTypeCodeEnum messageCode, JsonElement[] elements) => new(messageCode, elements);
+        protected virtual WampMessage<TMessageTypeCodeEnum> OnMessageReceived(TMessageTypeCodeEnum messageCode, JsonElement[] elements) => new(messageCode, elements);
 
-        public new async Task<WampResponseMessage<TMessageTypeCodeEnum>> ReceiveAsync(CancellationToken cancellationToken = default)
+        public new async Task<WampMessage<TMessageTypeCodeEnum>> ReceiveAsync(CancellationToken cancellationToken = default)
         {
             var array = await ReceiveJsonArrayAsync(cancellationToken);
             return OnMessageReceived((TMessageTypeCodeEnum)Enum.ToObject(typeof(TMessageTypeCodeEnum), array[0].GetUInt16()), array.Skip(1).ToArray());
         }
 
-        async Task<WampResponseMessage> IWampRole.ReceiveAsync(CancellationToken cancellationToken) => await base.ReceiveAsync(cancellationToken);
+        async Task<WampMessage> IWampRole.ReceiveAsync(CancellationToken cancellationToken) => await base.ReceiveAsync(cancellationToken);
     }
 }
