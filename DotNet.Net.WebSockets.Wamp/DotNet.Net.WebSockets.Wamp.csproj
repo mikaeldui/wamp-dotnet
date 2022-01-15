@@ -12,14 +12,14 @@
     <Description>Adds WAMP classes to System.Net.WebSockets.</Description>
     <PackageProjectUrl>https://github.com/mikaeldui/dotnet-net-websockets-wamp</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>DotNet.Net.WebSockets.Wamp.png</PackageIcon>
+    <PackageIcon>Mesh-256x256.png</PackageIcon>
     <RepositoryUrl>https://github.com/mikaeldui/dotnet-net-websockets-wamp</RepositoryUrl>
-    <PackageTags>WAMP; WebSockets</PackageTags>
+    <PackageTags>WAMP; WebSockets; PubSub; RPC</PackageTags>
     <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\DotNet.Net.WebSockets.Wamp.png">
+    <None Include="..\Mesh-256x256.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

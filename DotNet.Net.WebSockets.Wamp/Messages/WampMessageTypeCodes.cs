@@ -5,13 +5,13 @@ using System.Text;
 
 namespace System.Net.WebSockets.Wamp
 {
-    internal static class WampMessageCodesLoader
+    internal static class WampMessageTypeCodesLoader
     {
         /// <summary>
         /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageCode"/>.
         /// </summary>
         internal static T LoadFromEnum<T>(Type @enum)
-            where T : WampMessageCodes
+            where T : WampMessageTypeCodes
         {
             var type = typeof(T);
             var messageCodes = (T) Activator.CreateInstance(type, true);
@@ -25,10 +25,12 @@ namespace System.Net.WebSockets.Wamp
         }
     }
 
+    // TODO: Consider making these classes internal.
+
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class WampMessageCodes
+    public class WampMessageTypeCodes
     {
-        internal protected WampMessageCodes()
+        internal protected WampMessageTypeCodes()
         {
         }
 
@@ -47,13 +49,13 @@ namespace System.Net.WebSockets.Wamp
         internal bool IsReadOnly = false;
     }
 
-    public class WampSubscriberMessageCodes : WampMessageCodes
+    public class WampSubscriberMessageTypeCodes : WampMessageTypeCodes
     {
-        internal WampSubscriberMessageCodes()
+        internal WampSubscriberMessageTypeCodes()
         {
         }
         
-        public WampSubscriberMessageCodes(ushort subscribe, ushort unsubscribe, ushort @event)
+        public WampSubscriberMessageTypeCodes(ushort subscribe, ushort unsubscribe, ushort @event)
         {
             Subscribe = subscribe;
             Unsubscribe = unsubscribe;
@@ -72,16 +74,16 @@ namespace System.Net.WebSockets.Wamp
         public ushort? Unsubscribed { get => _unsubscribed; set { if (IsReadOnly) throw new InvalidOperationException("This WampMessageCodes is read-only."); _unsubscribed = value; } }
         public ushort Event { get => _event; set { if (IsReadOnly) throw new InvalidOperationException("This WampMessageCodes is read-only."); _event = value; } }
 
-        public static readonly WampSubscriberMessageCodes BasicProfile = FromEnum<WampBasicProfile.WampSubscriberMessageCode>();
+        public static readonly WampSubscriberMessageTypeCodes BasicProfile = FromEnum<WampBasicProfile.WampSubscriberMessageCode>();
 
         /// <summary>
         /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageCode"/>.
         /// </summary>
-        public static WampSubscriberMessageCodes FromEnum<TEnum>() where TEnum : struct, Enum => FromEnum(typeof(TEnum));
+        public static WampSubscriberMessageTypeCodes FromEnum<TEnum>() where TEnum : struct, Enum => FromEnum(typeof(TEnum));
 
         /// <summary>
         /// [ADVANCED] Use an enum like <see cref="WampBasicProfile.WampSubscriberMessageCode"/>.
         /// </summary>
-        public static WampSubscriberMessageCodes FromEnum(Type @enum) => WampMessageCodesLoader.LoadFromEnum<WampSubscriberMessageCodes>(@enum);
+        public static WampSubscriberMessageTypeCodes FromEnum(Type @enum) => WampMessageTypeCodesLoader.LoadFromEnum<WampSubscriberMessageTypeCodes>(@enum);
     }
 }

@@ -2,22 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RiotGames.LeagueOfLegends.LeagueClient;
 
 namespace System.Net.WebSockets.Wamp.Tests
 {
+    enum LeagueClientMessageCode
+    {
+        Subscribe = 5,
+        Unsubscribe = 6,
+        Event = 8
+    }
+
     [TestClass]
     public class LeagueClientTests
     {
-        enum LeagueClientMessageCode
-        {
-            Subscribe = 5,
-            Unsubscribe = 6,
-            Event = 8
-        }
-
         static readonly bool _isLeagueClientRunning = Process.GetProcesses().Any(p => p.ProcessName == "LeagueClient");
 
         [TestMethod]
