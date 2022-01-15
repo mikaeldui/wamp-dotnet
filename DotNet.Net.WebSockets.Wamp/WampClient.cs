@@ -159,10 +159,9 @@ namespace System.Net.WebSockets.Wamp
         where TMessageCodes : WampMessageCodes
         where TMessageCodeEnum : struct, Enum
     {
-        protected new ClientWebSocket WebSocket;
-
-        internal protected WampRoleClientBase(TMessageCodes messageCodes) : base(messageCodes) => 
-            WebSocket = (ClientWebSocket)base.WebSocket;
+        internal protected WampRoleClientBase(TMessageCodes messageCodes) : base(messageCodes) 
+        { 
+        }
 
         public virtual async Task SendAsync(WampRequestMessage<TMessageCodeEnum> message, CancellationToken cancellationToken = default) =>
             await base.SendAsync(message, cancellationToken);
