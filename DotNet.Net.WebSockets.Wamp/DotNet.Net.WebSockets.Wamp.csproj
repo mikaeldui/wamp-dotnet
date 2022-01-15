@@ -10,10 +10,10 @@
     <Authors>Mikael Dúi Bolinder</Authors>
     <Product>Mikael Dúi's .NET WebSockets WAMP Library</Product>
     <Description>Adds WAMP classes to System.Net.WebSockets.</Description>
-    <PackageProjectUrl>https://github.com/mikaeldui/dotnet-net-websockets-wamp</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/mikaeldui/wamp-dotnet</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Mesh-256x256.png</PackageIcon>
-    <RepositoryUrl>https://github.com/mikaeldui/dotnet-net-websockets-wamp</RepositoryUrl>
+    <RepositoryUrl>https://github.com/mikaeldui/wamp-dotnet</RepositoryUrl>
     <PackageTags>WAMP; WebSockets; PubSub; RPC</PackageTags>
     <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
   </PropertyGroup>
