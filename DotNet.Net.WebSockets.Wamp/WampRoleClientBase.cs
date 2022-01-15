@@ -33,8 +33,11 @@ namespace System.Net.WebSockets.Wamp
     {
         protected new ClientWebSocket WebSocket;
 
-        internal protected WampRoleClientBase(TMessageTypeCodes messageCodes) : base(new ClientWebSocket(), messageCodes) => 
+        internal protected WampRoleClientBase(TMessageTypeCodes messageCodes) : base(new ClientWebSocket(), messageCodes)
+        {
             WebSocket = (ClientWebSocket)base.WebSocket;
+            WebSocket.Options.SetRequestHeader("User-Agent", WampRoleClientUserAgent.USER_AGENT);
+        }
 
         public ClientWebSocketOptions Options => ((ClientWebSocket)WebSocket).Options;
 

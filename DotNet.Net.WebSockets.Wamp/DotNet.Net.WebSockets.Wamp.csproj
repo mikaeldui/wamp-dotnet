@@ -16,6 +16,7 @@
     <RepositoryUrl>https://github.com/mikaeldui/wamp-dotnet</RepositoryUrl>
     <PackageTags>WAMP; WebSockets; PubSub; RPC</PackageTags>
     <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
+    <AssemblyName>MikaelDui.Net.WebSockets.Wamp</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,6 +32,7 @@
 
   <ItemGroup>
     <PackageReference Include="MikaelDui.Extensions" Version="*" />
+    <PackageReference Include="MikaelDui.Net.UserAgent" Version="1.0.2" />
     <PackageReference Include="MikaelDui.Net.WebSockets.Extensions" Version="*" />
   </ItemGroup>
 
