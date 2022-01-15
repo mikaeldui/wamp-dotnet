@@ -3,6 +3,7 @@ using System.Text.Json;
 
 namespace System.Net.WebSockets.Wamp
 {
+    #region Interfaces
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IWampRole : IDisposable
     {
@@ -27,6 +28,7 @@ namespace System.Net.WebSockets.Wamp
         Task SendAsync(WampMessage<TMessageTypeCodeEnum> message, CancellationToken cancellationToken = default);
         new Task<WampMessage<TMessageTypeCodeEnum>> ReceiveAsync(CancellationToken cancellationToken = default);
     }
+    #endregion Interfaces
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract class WampRoleBase<TMessageTypeCodes> : IWampRole<TMessageTypeCodes>, IWampRole
