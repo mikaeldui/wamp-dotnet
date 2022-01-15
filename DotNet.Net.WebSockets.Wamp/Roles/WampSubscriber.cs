@@ -11,7 +11,7 @@
     {
     }
 
-    internal static class WampSubscriberMethods
+    internal static class WampSubscriberMethodImplementations
     {
         public static async Task SendSubscribeAsync(this IWampSubscriber wampSubscriber, string topic, CancellationToken cancellationToken = default) =>
             await wampSubscriber.SendAsync(new(wampSubscriber.MessageCodes.Subscribe, topic), cancellationToken);
