@@ -32,12 +32,11 @@ namespace System.Net.WebSockets.Wamp
         IWampRole<TMessageTypeCodes>, IWampRole
         where TMessageTypeCodes : WampMessageTypeCodes
     {
-        protected new ClientWebSocket WebSocket;
+        protected new ClientWebSocket WebSocket => (ClientWebSocket)base.WebSocket;
         private Action<ClientWebSocketOptions>? _useOptions;
 
         protected internal WampRoleClientBase(TMessageTypeCodes messageCodes) : base(new ClientWebSocket(), messageCodes)
         {
-            WebSocket = (ClientWebSocket)base.WebSocket;
             WebSocket.Options.SetRequestHeader("User-Agent", WampRoleClientUserAgent.USER_AGENT);
         }
 
@@ -54,7 +53,7 @@ namespace System.Net.WebSockets.Wamp
             if (WebSocket.State != WebSocketState.None)
             {
                 WebSocket.Dispose();
-                WebSocket = new ClientWebSocket();
+                base.WebSocket = new ClientWebSocket();
             }
 
             _useOptions?.Invoke(WebSocket.Options);
@@ -67,7 +66,7 @@ namespace System.Net.WebSockets.Wamp
             if (WebSocket.State != WebSocketState.None)
             {
                 WebSocket.Dispose();
-                WebSocket = new ClientWebSocket();
+                base.WebSocket = new ClientWebSocket();
             }
 
             _useOptions?.Invoke(WebSocket.Options);

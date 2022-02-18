@@ -35,7 +35,10 @@ namespace System.Net.WebSockets.Wamp
     public abstract class WampRoleBase<TMessageTypeCodes> : IWampRole<TMessageTypeCodes>, IWampRole
         where TMessageTypeCodes : WampMessageTypeCodes
     {
-        protected readonly WebSocket WebSocket;
+        /// <summary>
+        /// Can be changed by WampRoleClientBase.
+        /// </summary>
+        protected WebSocket WebSocket;
         public TMessageTypeCodes MessageCodes { get; }
 
         protected internal WampRoleBase(WebSocket webSocket, TMessageTypeCodes messageCodes)
