@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Text.Json;
+// ReSharper disable UnusedMember.Global
 
 namespace System.Net.WebSockets.Wamp
 {
@@ -19,10 +20,10 @@ namespace System.Net.WebSockets.Wamp
     internal static class WampSubscriberMethodImplementations
     {
         internal static async Task SubscribeAsyncInternal(this IWampSubscriber wampSubscriber, string topic, CancellationToken cancellationToken = default) =>
-            await wampSubscriber.SendAsync(new(wampSubscriber.MessageCodes.Subscribe, topic), cancellationToken);
+            await wampSubscriber.SendAsync(new WampMessage(wampSubscriber.MessageCodes.Subscribe, topic), cancellationToken);
 
         internal static async Task UnsubscribeAsyncInternal(this IWampSubscriber wampSubscriber, string topic, CancellationToken cancellationToken = default) =>
-            await wampSubscriber.SendAsync(new(wampSubscriber.MessageCodes.Unsubscribe, topic), cancellationToken);
+            await wampSubscriber.SendAsync(new WampMessage(wampSubscriber.MessageCodes.Unsubscribe, topic), cancellationToken);
 
         //internal static WampResponseMessage? OnMessageReceivedInternal(this IWampSubscriber wampSubscriber, ushort messageCode, JsonElement[] elements)
         //{

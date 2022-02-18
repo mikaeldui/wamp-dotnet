@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Text.Json;
+// ReSharper disable UnusedMember.Global
 
 namespace System.Net.WebSockets.Wamp
 {
@@ -33,19 +34,35 @@ namespace System.Net.WebSockets.Wamp
     {
         protected new ClientWebSocket WebSocket;
 
-        internal protected WampRoleClientBase(TMessageTypeCodes messageCodes) : base(new ClientWebSocket(), messageCodes)
+        protected internal WampRoleClientBase(TMessageTypeCodes messageCodes) : base(new ClientWebSocket(), messageCodes)
         {
             WebSocket = (ClientWebSocket)base.WebSocket;
             WebSocket.Options.SetRequestHeader("User-Agent", WampRoleClientUserAgent.USER_AGENT);
         }
 
-        public ClientWebSocketOptions Options => ((ClientWebSocket)WebSocket).Options;
+        public ClientWebSocketOptions Options => WebSocket.Options;
 
-        public virtual async Task ConnectAsync(Uri uri, CancellationToken cancellationToken = default) => 
-            await WebSocket.ConnectAsync(uri, cancellationToken);
+        public virtual async Task ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
+        {
+            if (WebSocket.State != WebSocketState.None)
+            {
+                WebSocket.Dispose();
+                WebSocket = new ClientWebSocket();
+            }
 
-        public virtual async Task ConnectAsync(string uri, CancellationToken cancellationToken = default) => 
             await WebSocket.ConnectAsync(uri, cancellationToken);
+        }
+
+        public virtual async Task ConnectAsync(string uri, CancellationToken cancellationToken = default)
+        {
+            if (WebSocket.State != WebSocketState.None)
+            {
+                WebSocket.Dispose();
+                WebSocket = new ClientWebSocket();
+            }
+
+            await WebSocket.ConnectAsync(uri, cancellationToken);
+        }
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -55,7 +72,7 @@ namespace System.Net.WebSockets.Wamp
         where TMessageTypeCodes : WampMessageTypeCodes
         where TMessageTypeCodeEnum : struct, Enum
     {
-        internal protected WampRoleClientBase(TMessageTypeCodes messageCodes) : base(messageCodes)
+        protected internal WampRoleClientBase(TMessageTypeCodes messageCodes) : base(messageCodes)
         {
         }
 

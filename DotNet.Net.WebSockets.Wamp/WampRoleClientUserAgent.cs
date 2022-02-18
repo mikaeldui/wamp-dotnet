@@ -13,9 +13,16 @@ namespace System.Net.WebSockets.Wamp
         {
             var wampUserAgent = UserAgent.From(typeof(WampRoleClientUserAgent).GetTypeInfo().Assembly);
 
-            var entryAssembly = Assembly.GetEntryAssembly();
-            if (entryAssembly != null)
-                wampUserAgent.DependentProduct = UserAgent.From(entryAssembly);
+            try
+            {
+                var entryAssembly = Assembly.GetEntryAssembly();
+                if (entryAssembly != null)
+                    wampUserAgent.DependentProduct = UserAgent.From(entryAssembly);
+            }
+            catch
+            {
+                // ignored
+            }
 
             USER_AGENT = wampUserAgent.ToString();
         }

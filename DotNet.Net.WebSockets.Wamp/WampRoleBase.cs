@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Text.Json;
+// ReSharper disable UnusedMember.Global
 
 namespace System.Net.WebSockets.Wamp
 {
@@ -37,7 +38,7 @@ namespace System.Net.WebSockets.Wamp
         protected readonly WebSocket WebSocket;
         public TMessageTypeCodes MessageCodes { get; }
 
-        internal protected WampRoleBase(WebSocket webSocket, TMessageTypeCodes messageCodes)
+        protected internal WampRoleBase(WebSocket webSocket, TMessageTypeCodes messageCodes)
         {
             WebSocket = webSocket ?? throw new ArgumentNullException("WebSockets can't be null!", nameof(webSocket));
             MessageCodes = messageCodes ?? throw new ArgumentNullException("Message Codes can't be null!", nameof(messageCodes));
@@ -49,7 +50,7 @@ namespace System.Net.WebSockets.Wamp
             await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, cancellationToken);
         }
 
-        internal protected async Task<JsonElement[]> ReceiveJsonArrayAsync(CancellationToken cancellationToken = default)
+        protected internal async Task<JsonElement[]> ReceiveJsonArrayAsync(CancellationToken cancellationToken = default)
         {
             string? json = "";
 
@@ -97,7 +98,7 @@ namespace System.Net.WebSockets.Wamp
         }
 
         public async Task SendAsync(ushort messageCode, object[] elements, CancellationToken cancellationToken = default) =>
-            await SendAsync(new(messageCode, elements), cancellationToken);
+            await SendAsync(new WampMessage(messageCode, elements), cancellationToken);
 
         public WebSocketState State => WebSocket.State;
 
@@ -110,7 +111,7 @@ namespace System.Net.WebSockets.Wamp
         where TMessageTypeCodes : WampMessageTypeCodes
         where TMessageTypeCodeEnum : struct, Enum
     {
-        internal protected WampRoleBase(WebSocket webSocket, TMessageTypeCodes messageCodes) : base(webSocket, messageCodes)
+        protected internal WampRoleBase(WebSocket webSocket, TMessageTypeCodes messageCodes) : base(webSocket, messageCodes)
         {
         }
 
