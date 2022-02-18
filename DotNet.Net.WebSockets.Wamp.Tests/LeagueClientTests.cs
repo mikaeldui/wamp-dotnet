@@ -34,8 +34,11 @@ namespace System.Net.WebSockets.Wamp.Tests
             var lockFile = LeagueClientLockFile.FromProcess();
 
             WampSubscriberClient<LeagueClientMessageCode> client = new();
-            client.Options.RemoteCertificateValidationCallback = new Security.RemoteCertificateValidationCallback((_,_,_,_) => true);
-            client.Options.Credentials = new NetworkCredential("riot", lockFile.Password);
+            client.UseClientWebSocketOptions(options =>
+            {
+                options.RemoteCertificateValidationCallback = (_,_,_,_) => true;
+                options.Credentials = new NetworkCredential("riot", lockFile.Password);
+            });
             await client.ConnectAsync($"wss://127.0.0.1:{lockFile.Port}/");
             await client.SubscribeAsync("OnJsonApiEvent");
             var response = await client.ReceiveAsync();

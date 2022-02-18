@@ -33,6 +33,7 @@ namespace System.Net.WebSockets.Wamp
         where TMessageTypeCodes : WampMessageTypeCodes
     {
         protected new ClientWebSocket WebSocket;
+        private Action<ClientWebSocketOptions>? _useOptions;
 
         protected internal WampRoleClientBase(TMessageTypeCodes messageCodes) : base(new ClientWebSocket(), messageCodes)
         {
@@ -40,7 +41,13 @@ namespace System.Net.WebSockets.Wamp
             WebSocket.Options.SetRequestHeader("User-Agent", WampRoleClientUserAgent.USER_AGENT);
         }
 
+        [Obsolete("Use client.UseClientWebSocketOptions(options => {}) instead, since the ClientWebSocket is being recreated on disconnects.", true)]
         public ClientWebSocketOptions Options => WebSocket.Options;
+
+        /// <summary>
+        /// The options are only applied before connect.
+        /// </summary>
+        public void UseClientWebSocketOptions(Action<ClientWebSocketOptions> callback) => _useOptions = callback;
 
         public virtual async Task ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
         {
@@ -49,6 +56,8 @@ namespace System.Net.WebSockets.Wamp
                 WebSocket.Dispose();
                 WebSocket = new ClientWebSocket();
             }
+
+            _useOptions?.Invoke(WebSocket.Options);
 
             await WebSocket.ConnectAsync(uri, cancellationToken);
         }
@@ -60,6 +69,8 @@ namespace System.Net.WebSockets.Wamp
                 WebSocket.Dispose();
                 WebSocket = new ClientWebSocket();
             }
+
+            _useOptions?.Invoke(WebSocket.Options);
 
             await WebSocket.ConnectAsync(uri, cancellationToken);
         }
