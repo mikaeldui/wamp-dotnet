@@ -1,159 +1,160 @@
-﻿namespace System.Net.WebSockets.Wamp
+﻿// ReSharper disable UnusedMember.Global
+
+namespace System.Net.WebSockets.Wamp;
+
+public static class WampBasicProfile
 {
-    public static class WampBasicProfile
+    public enum WampBrokerMessageTypeCode : ushort
     {
-        public enum WampMessageTypeCode : ushort
-        {
-            Hello = 1,
-            Welcome = 2,
-            Abort = 3,
-            Goodbye = 6,
+        Hello = 1,
+        Welcome = 2,
+        Abort = 3,
+        Goodbye = 6,
 
-            Error = 8,
+        Error = 8,
 
-            Publish = 16,
-            Published = 17,
+        Publish = 16,
+        Published = 17,
 
-            Subscribe = 33,
-            Subscribed = 33,
-            Unsubscribe = 34,
-            Unsubscribed = 35,
-            Event = 36,
+        Subscribe = 33,
+        Subscribed = 33,
+        Unsubscribe = 34,
+        Unsubscribed = 35,
+        Event = 36,
 
-            Call = 48,
-            Result = 58,
+        Extension = 0
+    }
 
-            Register = 64,
-            Registered = 65,
-            Unregister = 66,
-            Unregistered = 67,
-            Invocation = 68,
-            Yield = 70,
+    public enum WampCalleeMessageTypeCode : ushort
+    {
+        Hello = 1,
+        Welcome = 2,
+        Abort = 3,
+        Goodbye = 6,
 
-            Extension = 0
-        }
+        Error = 8,
 
-        public enum WampRoleMessageTypeCode : ushort
-        {
-            Hello = 1,
-            Welcome = 2,
-            Abort = 3,
-            Goodbye = 6,
+        Register = 64,
+        Registered = 65,
+        Unregister = 66,
+        Unregistered = 67,
+        Invocation = 68,
+        Yield = 70,
 
-            Error = 8
-        }
+        Extension = 0
+    }
 
-        public enum WampCalleeMessageTypeCode : ushort
-        {
-            Hello = 1,
-            Welcome = 2,
-            Abort = 3,
-            Goodbye = 6,
+    public enum WampCallerMessageTypeCode : ushort
+    {
+        Hello = 1,
+        Welcome = 2,
+        Abort = 3,
+        Goodbye = 6,
 
-            Error = 8,
+        Error = 8,
 
-            Register = 64,
-            Registered = 65,
-            Unregister = 66,
-            Unregistered = 67,
-            Invocation = 68,
-            Yield = 70,
+        Subscribe = 33,
+        Subscribed = 33,
+        Unsubscribe = 34,
+        Unsubscribed = 35,
+        Event = 36,
 
-            Extension = 0
-        }
+        Extension = 0
+    }
 
-        public enum WampCallerMessageTypeCode : ushort
-        {
-            Hello = 1,
-            Welcome = 2,
-            Abort = 3,
-            Goodbye = 6,
+    public enum WampDealerMessageTypeCode : ushort
+    {
+        Hello = 1,
+        Welcome = 2,
+        Abort = 3,
+        Goodbye = 6,
 
-            Error = 8,
+        Error = 8,
 
-            Subscribe = 33,
-            Subscribed = 33,
-            Unsubscribe = 34,
-            Unsubscribed = 35,
-            Event = 36,
+        Call = 48,
+        Result = 58,
 
-            Extension = 0
-        }
+        Register = 64,
+        Registered = 65,
+        Unregister = 66,
+        Unregistered = 67,
+        Invocation = 68,
+        Yield = 70,
 
-        public enum WampPublisherMessageTypeCode : ushort
-        {
-            Hello = 1,
-            Welcome = 2,
-            Abort = 3,
-            Goodbye = 6,
+        Extension = 0
+    }
 
-            Error = 8,
+    public enum WampMessageTypeCode : ushort
+    {
+        Hello = 1,
+        Welcome = 2,
+        Abort = 3,
+        Goodbye = 6,
 
-            Publish = 16,
-            Published = 17,
+        Error = 8,
 
-            Extension = 0
-        }
+        Publish = 16,
+        Published = 17,
 
-        public enum WampSubscriberMessageTypeCode : ushort
-        {
-            Hello = 1,
-            Welcome = 2,
-            Abort = 3,
-            Goodbye = 6,
+        Subscribe = 33,
+        Subscribed = 33,
+        Unsubscribe = 34,
+        Unsubscribed = 35,
+        Event = 36,
 
-            Error = 8,
+        Call = 48,
+        Result = 58,
 
-            Subscribe = 33,
-            Subscribed = 33,
-            Unsubscribe = 34,
-            Unsubscribed = 35,
-            Event = 36,
+        Register = 64,
+        Registered = 65,
+        Unregister = 66,
+        Unregistered = 67,
+        Invocation = 68,
+        Yield = 70,
 
-            Extension = 0
-        }
+        Extension = 0
+    }
 
-        public enum WampDealerMessageTypeCode : ushort
-        {
-            Hello = 1,
-            Welcome = 2,
-            Abort = 3,
-            Goodbye = 6,
+    public enum WampPublisherMessageTypeCode : ushort
+    {
+        Hello = 1,
+        Welcome = 2,
+        Abort = 3,
+        Goodbye = 6,
 
-            Error = 8,
+        Error = 8,
 
-            Call = 48,
-            Result = 58,
+        Publish = 16,
+        Published = 17,
 
-            Register = 64,
-            Registered = 65,
-            Unregister = 66,
-            Unregistered = 67,
-            Invocation = 68,
-            Yield = 70,
+        Extension = 0
+    }
 
-            Extension = 0
-        }
+    public enum WampRoleMessageTypeCode : ushort
+    {
+        Hello = 1,
+        Welcome = 2,
+        Abort = 3,
+        Goodbye = 6,
 
-        public enum WampBrokerMessageTypeCode : ushort
-        {
-            Hello = 1,
-            Welcome = 2,
-            Abort = 3,
-            Goodbye = 6,
+        Error = 8
+    }
 
-            Error = 8,
+    public enum WampSubscriberMessageTypeCode : ushort
+    {
+        Hello = 1,
+        Welcome = 2,
+        Abort = 3,
+        Goodbye = 6,
 
-            Publish = 16,
-            Published = 17,
+        Error = 8,
 
-            Subscribe = 33,
-            Subscribed = 33,
-            Unsubscribe = 34,
-            Unsubscribed = 35,
-            Event = 36,
+        Subscribe = 33,
+        Subscribed = 33,
+        Unsubscribe = 34,
+        Unsubscribed = 35,
+        Event = 36,
 
-            Extension = 0
-        }
+        Extension = 0
     }
 }

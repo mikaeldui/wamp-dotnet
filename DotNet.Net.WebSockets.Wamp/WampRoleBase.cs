@@ -1,148 +1,179 @@
 using System.ComponentModel;
 using System.Text.Json;
+
 // ReSharper disable UnusedMember.Global
 
-namespace System.Net.WebSockets.Wamp
+namespace System.Net.WebSockets.Wamp;
+
+#region Interfaces
+
+[EditorBrowsable(EditorBrowsableState.Never)]
+public interface IWampRole : IDisposable
 {
-    #region Interfaces
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IWampRole : IDisposable
+    Task SendAsync(WampMessage message, CancellationToken cancellationToken = default);
+    Task SendAsync(ushort messageCode, object[] elements, CancellationToken cancellationToken = default);
+    Task<WampMessage> ReceiveAsync(CancellationToken cancellationToken = default);
+    Task CloseAsync(CancellationToken cancellationToken = default);
+}
+
+[EditorBrowsable(EditorBrowsableState.Never)]
+public interface IWampRole<out TMessageTypeCodes> : IWampRole
+    where TMessageTypeCodes : WampMessageTypeCodes
+{
+    TMessageTypeCodes MessageCodes { get; }
+}
+
+[EditorBrowsable(EditorBrowsableState.Never)]
+public interface IWampRole<out TMessageTypeCodes, TMessageTypeCodeEnum> : IWampRole<TMessageTypeCodes>, IWampRole,
+    IDisposable
+    where TMessageTypeCodes : WampMessageTypeCodes
+    where TMessageTypeCodeEnum : struct, Enum
+{
+    Task SendAsync(WampMessage<TMessageTypeCodeEnum> message, CancellationToken cancellationToken = default);
+    new Task<WampMessage<TMessageTypeCodeEnum>> ReceiveAsync(CancellationToken cancellationToken = default);
+}
+
+#endregion Interfaces
+
+[EditorBrowsable(EditorBrowsableState.Never)]
+public abstract class WampRoleBase<TMessageTypeCodes> : IWampRole<TMessageTypeCodes>
+    where TMessageTypeCodes : WampMessageTypeCodes
+{
+    /// <summary>
+    ///     Can be changed by WampRoleClientBase.
+    /// </summary>
+    protected WebSocket WebSocket;
+
+    protected internal WampRoleBase(WebSocket webSocket, TMessageTypeCodes messageCodes)
     {
-        Task SendAsync(WampMessage message, CancellationToken cancellationToken = default);
-        Task SendAsync(ushort messageCode, object[] elements, CancellationToken cancellationToken = default);
-        Task<WampMessage> ReceiveAsync(CancellationToken cancellationToken = default);
-        Task CloseAsync(CancellationToken cancellationToken = default);
+        WebSocket = webSocket ?? throw new ArgumentNullException(nameof(webSocket), "WebSockets can't be null!");
+        MessageCodes = messageCodes ??
+                       throw new ArgumentNullException(nameof(messageCodes), "Message Codes can't be null!");
     }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IWampRole<TMessageTypeCodes> : IWampRole
-        where TMessageTypeCodes : WampMessageTypeCodes
+    public WebSocketState State => WebSocket.State;
+
+    public WebSocketCloseStatus? CloseStatus => WebSocket.CloseStatus;
+    public TMessageTypeCodes MessageCodes { get; }
+
+    public async Task CloseAsync(CancellationToken cancellationToken = default)
     {
-        TMessageTypeCodes MessageCodes { get; }
+        //await SendAsync(MessageCodes.Goodbye ?? (ushort) WampBasicProfile.WampRoleMessageTypeCode.Goodbye, new object[0], cancellationToken);
+        await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", cancellationToken);
     }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IWampRole<TMessageTypeCodes, TMessageTypeCodeEnum> : IWampRole<TMessageTypeCodes>, IWampRole, IDisposable
-        where TMessageTypeCodes : WampMessageTypeCodes
-        where TMessageTypeCodeEnum : struct, Enum
+    public async Task<WampMessage> ReceiveAsync(CancellationToken cancellationToken = default)
     {
-        Task SendAsync(WampMessage<TMessageTypeCodeEnum> message, CancellationToken cancellationToken = default);
-        new Task<WampMessage<TMessageTypeCodeEnum>> ReceiveAsync(CancellationToken cancellationToken = default);
-    }
-    #endregion Interfaces
-
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class WampRoleBase<TMessageTypeCodes> : IWampRole<TMessageTypeCodes>, IWampRole
-        where TMessageTypeCodes : WampMessageTypeCodes
-    {
-        /// <summary>
-        /// Can be changed by WampRoleClientBase.
-        /// </summary>
-        protected WebSocket WebSocket;
-        public TMessageTypeCodes MessageCodes { get; }
-
-        protected internal WampRoleBase(WebSocket webSocket, TMessageTypeCodes messageCodes)
-        {
-            WebSocket = webSocket ?? throw new ArgumentNullException("WebSockets can't be null!", nameof(webSocket));
-            MessageCodes = messageCodes ?? throw new ArgumentNullException("Message Codes can't be null!", nameof(messageCodes));
-        }
-
-        public async Task CloseAsync(CancellationToken cancellationToken = default)
-        {
-            //await SendAsync(MessageCodes.Goodbye ?? (ushort) WampBasicProfile.WampRoleMessageTypeCode.Goodbye, new object[0], cancellationToken);
-            await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, cancellationToken);
-        }
-
-        protected internal async Task<JsonElement[]> ReceiveJsonArrayAsync(CancellationToken cancellationToken = default)
-        {
-            string? json = "";
-
-            // The League client sometimes sends empty strings. Unsure why.
-            for (int i = 0; i < 100 && string.IsNullOrEmpty(json); i++)
-                json = await WebSocket.ReceiveStringAsync(cancellationToken);
-
-            using var doc = JsonDocument.Parse(json);
-
-            if (doc.RootElement.ValueKind != JsonValueKind.Array)
-                throw new WampResponseException("The returned message isn't a JSON array!", json);
-
-            if (doc.RootElement.GetArrayLength() == 0)
-                throw new WampResponseException("The returned JSON array didn't contain any values!", json);
-
-            // TODO: Check if one enumerator is enough
-            var enumerator = doc.RootElement.EnumerateArray();
-            enumerator.MoveNext();
-            if (enumerator.Current.ValueKind != JsonValueKind.Number)
-                throw new WampResponseException("The first item in the returned array wasn't a message code!", json);
-
-            return doc.RootElement.Clone().EnumerateArray().ToArray();
-        }
-
-        /// <summary>
-        /// Override this method to do custom logic on messages received.
-        /// </summary>
-        protected virtual WampMessage OnMessageReceived(ushort messageCode, JsonElement[] elements) => new(messageCode, elements);
-
-        public async Task<WampMessage> ReceiveAsync(CancellationToken cancellationToken = default)
-        {
-            var array = await ReceiveJsonArrayAsync(cancellationToken);
-            return OnMessageReceived(array[0].GetUInt16(), array.Skip(1).ToArray());
-        }
-
-        public async Task SendAsync(WampMessage request, CancellationToken cancellationToken = default)
-        {
-            var array = new object[request.Elements.Length + 1];
-            array[0] = request.MessageCode;
-            request.Elements.CopyTo(array, 1);
-
-            var json = JsonSerializer.Serialize(array);
-
-            await WebSocket.SendStringAsync(json, cancellationToken);
-        }
-
-        public async Task SendAsync(ushort messageCode, object[] elements, CancellationToken cancellationToken = default) =>
-            await SendAsync(new WampMessage(messageCode, elements), cancellationToken);
-
-        public WebSocketState State => WebSocket.State;
-
-        public void Dispose() => WebSocket.Dispose();
+        var array = await ReceiveJsonArrayAsync(cancellationToken);
+        return OnMessageReceived(array[0].GetUInt16(), array.Skip(1).ToArray());
     }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class WampRoleBase<TMessageTypeCodes, TMessageTypeCodeEnum> : 
-        WampRoleBase<TMessageTypeCodes>, IWampRole<TMessageTypeCodes, TMessageTypeCodeEnum>, IWampRole<TMessageTypeCodes>, IWampRole
-        where TMessageTypeCodes : WampMessageTypeCodes
-        where TMessageTypeCodeEnum : struct, Enum
+    public async Task SendAsync(WampMessage request, CancellationToken cancellationToken = default)
     {
-        protected internal WampRoleBase(WebSocket webSocket, TMessageTypeCodes messageCodes) : base(webSocket, messageCodes)
-        {
-        }
+        var array = new object[request.Elements.Length + 1];
+        array[0] = request.MessageCode;
+        request.Elements.CopyTo(array, 1);
 
-        public async Task SendAsync(WampMessage<TMessageTypeCodeEnum> message, CancellationToken cancellationToken = default) => 
-            await base.SendAsync(message, cancellationToken);
+        var json = JsonSerializer.Serialize(array);
+
+        await WebSocket.SendStringAsync(json, cancellationToken);
+    }
+
+    public async Task SendAsync(ushort messageCode, object[] elements, CancellationToken cancellationToken = default)
+    {
+        await SendAsync(new WampMessage(messageCode, elements), cancellationToken);
+    }
+
+    public void Dispose()
+    {
+        WebSocket.Dispose();
+    }
+
+    protected internal async Task<JsonElement[]> ReceiveJsonArrayAsync(CancellationToken cancellationToken = default)
+    {
+        var json = "";
+
+        // The League client sometimes sends empty strings. Unsure why.
+        for (var i = 0; i < 100 && string.IsNullOrEmpty(json); i++)
+            json = await WebSocket.ReceiveStringAsync(cancellationToken);
+
+        using var doc = JsonDocument.Parse(json);
+
+        if (doc.RootElement.ValueKind != JsonValueKind.Array)
+            throw new WampResponseException("The returned message isn't a JSON array!", json);
+
+        if (doc.RootElement.GetArrayLength() == 0)
+            throw new WampResponseException("The returned JSON array didn't contain any values!", json);
+
+        // TODO: Check if one enumerator is enough
+        var enumerator = doc.RootElement.EnumerateArray();
+        enumerator.MoveNext();
+        if (enumerator.Current.ValueKind != JsonValueKind.Number)
+            throw new WampResponseException("The first item in the returned array wasn't a message code!", json);
+
+        return doc.RootElement.Clone().EnumerateArray().ToArray();
+    }
+
+    /// <summary>
+    ///     Override this method to do custom logic on messages received.
+    /// </summary>
+    protected virtual WampMessage OnMessageReceived(ushort messageCode, JsonElement[] elements)
+    {
+        return new(messageCode, elements);
+    }
+}
+
+[EditorBrowsable(EditorBrowsableState.Never)]
+public abstract class WampRoleBase<TMessageTypeCodes, TMessageTypeCodeEnum> :
+    WampRoleBase<TMessageTypeCodes>, IWampRole<TMessageTypeCodes, TMessageTypeCodeEnum>
+    where TMessageTypeCodes : WampMessageTypeCodes
+    where TMessageTypeCodeEnum : struct, Enum
+{
+    protected internal WampRoleBase(WebSocket webSocket, TMessageTypeCodes messageCodes) : base(webSocket, messageCodes)
+    {
+    }
+
+    public async Task SendAsync(WampMessage<TMessageTypeCodeEnum> message,
+        CancellationToken cancellationToken = default)
+    {
+        await base.SendAsync(message, cancellationToken);
+    }
+
+    public new async Task<WampMessage<TMessageTypeCodeEnum>> ReceiveAsync(CancellationToken cancellationToken = default)
+    {
+        var array = await ReceiveJsonArrayAsync(cancellationToken);
+        return OnMessageReceived(
+            (TMessageTypeCodeEnum) Enum.ToObject(typeof(TMessageTypeCodeEnum), array[0].GetUInt16()),
+            array.Skip(1).ToArray());
+    }
+
+    async Task<WampMessage> IWampRole.ReceiveAsync(CancellationToken cancellationToken)
+    {
+        return await base.ReceiveAsync(cancellationToken);
+    }
 
 #pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Use the other OnMessageReceived. This method is NOT called in this class.", true)]
-        protected override WampMessage OnMessageReceived(ushort messageCode, JsonElement[] elements) => throw new NotImplementedException();
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("Use the other OnMessageReceived. This method is NOT called in this class.", true)]
+    protected override WampMessage OnMessageReceived(ushort messageCode, JsonElement[] elements)
+    {
+        throw new NotImplementedException();
+    }
 #pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
 
-        /// <summary>
-        /// Override this method to do custom logic on messages received.
-        /// </summary>
-        protected virtual WampMessage<TMessageTypeCodeEnum> OnMessageReceived(TMessageTypeCodeEnum messageCode, JsonElement[] elements) => new(messageCode, elements);
-
-        public new async Task<WampMessage<TMessageTypeCodeEnum>> ReceiveAsync(CancellationToken cancellationToken = default)
-        {
-            var array = await ReceiveJsonArrayAsync(cancellationToken);
-            return OnMessageReceived((TMessageTypeCodeEnum)Enum.ToObject(typeof(TMessageTypeCodeEnum), array[0].GetUInt16()), array.Skip(1).ToArray());
-        }
-
-        async Task<WampMessage> IWampRole.ReceiveAsync(CancellationToken cancellationToken) => await base.ReceiveAsync(cancellationToken);
+    /// <summary>
+    ///     Override this method to do custom logic on messages received.
+    /// </summary>
+    protected virtual WampMessage<TMessageTypeCodeEnum> OnMessageReceived(TMessageTypeCodeEnum messageCode,
+        JsonElement[] elements)
+    {
+        return new(messageCode, elements);
     }
+}
 
-    #region Other Roles
+#region Other Roles
+
 #if false
-
     public interface IWampPublisher : IWampRole
     {
         Task PublishAsync(JsonElement element, CancellationToken cancellationToken = default);
@@ -251,5 +282,4 @@ namespace System.Net.WebSockets.Wamp
     }
 #endif
 
-    #endregion Other Roles
-}
+#endregion Other Roles
