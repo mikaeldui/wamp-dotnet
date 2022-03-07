@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="*" />
     <PackageReference Include="MikaelDui.Extensions" Version="*" />
-    <PackageReference Include="MikaelDui.RiotGames.LeagueOfLegends.LeagueClient.LockFile" Version="1.0.1" />
+    <PackageReference Include="MikaelDui.RiotGames.LeagueOfLegends.LeagueClient.LockFile" Version="1.0.8+3e79e9d" />
     <PackageReference Include="MSTest.TestAdapter" Version="*" />
     <PackageReference Include="MSTest.TestFramework" Version="*" />
     <PackageReference Include="coverlet.collector" Version="*" />
